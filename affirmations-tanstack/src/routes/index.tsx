@@ -34,6 +34,7 @@ export const Route = createFileRoute('/')({
 
       return {
         affirmation: affirmationData.affirmation,
+        longestWord,
         cloudinaryUrl,
         photoId: unsplashData.id,
         publicId,
@@ -50,23 +51,37 @@ function AffirmationPage() {
   const initialData = Route.useLoaderData()
   const [imageUrl, setImageUrl] = useState(initialData.cloudinaryUrl)
   const [affirmation, setAffirmation] = useState(initialData.affirmation)
+  const [longestWord, setLongestWord] = useState(initialData.longestWord)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const posterRef = useRef<HTMLDivElement>(null)
   const wordRef = useRef<HTMLHeadingElement>(null)
 
-  // Find the longest word in the affirmation for Successory display
-  const longestWord = useMemo(() => {
-    const words = affirmation.split(' ').filter(word => word.length > 0)
-    return words.reduce((longest, current) => 
-      current.length > longest.length ? current : longest, ''
-    ).toUpperCase()
-  }, [affirmation])
-
-  // Add smaller dots between each letter for Successory style
-  const longestWordWithDots = useMemo(() => {
-    return longestWord.split('').join(' · ')
-  }, [longestWord])
+  // Convert to uppercase for display with styled first/last letters, remove punctuation
+  const longestWordForDisplay = longestWord.replace(/[^\w]/g, '').toUpperCase()
+  
+  // Create styled word: first & last letters bigger, middle underlined
+  const styledWord = useMemo(() => {
+    const letters = longestWordForDisplay.split('')
+    if (letters.length <= 2) {
+      return <span>{letters.join('')}</span>
+    }
+    
+    const first = letters[0]
+    const middle = letters.slice(1, -1).join('')
+    const last = letters[letters.length - 1]
+    
+    return (
+      <span className="inline-flex items-start">
+        <span className="text-[1.3em]">{first}</span>
+        <span className="underline underline-offset-4 decoration-2 box-decoration-clone">{middle}</span>
+        <span className="text-[1.3em] ml-[0.05em]">{last}</span>
+      </span>
+    )
+  }, [longestWordForDisplay])
+  
+  // Plain text version for print
+  const longestWordWithDots = longestWordForDisplay
 
   // Adjust font size to fit the word in the container
   useEffect(() => {
@@ -103,7 +118,7 @@ function AffirmationPage() {
       
       element.style.fontSize = `${bestSize}px`
     }
-  }, [longestWordWithDots])
+  }, [longestWordForDisplay])
 
   const handleGetNewOne = async () => {
     setIsLoading(true)
@@ -136,6 +151,7 @@ function AffirmationPage() {
 
       setImageUrl(cloudinaryUrl)
       setAffirmation(affirmationData.affirmation)
+      setLongestWord(longestWord)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to fetch affirmation')
     } finally {
@@ -154,8 +170,13 @@ function AffirmationPage() {
               <title>Affirmation Poster</title>
               <style>
                 @page {
-                  size: letter portrait;
+                  size: letter landscape;
                   margin: 0;
+                }
+                * {
+                  page-break-inside: avoid;
+                  page-break-after: avoid;
+                  page-break-before: avoid;
                 }
                 body {
                   margin: 0;
@@ -163,53 +184,77 @@ function AffirmationPage() {
                   background: black;
                   display: flex;
                   justify-content: center;
-                  align-items: center;
-                  min-height: 100vh;
+                  align-items: flex-start;
+                  height: 8.5in;
+                  width: 11in;
                   font-family: Georgia, serif;
+                  overflow: hidden;
                 }
                 .poster-container {
-                  width: 8.5in;
-                  min-height: 11in;
+                  width: 11in;
+                  height: 8.5in;
+                  max-height: 8.5in;
                   background: black;
-                  padding: 1in;
+                  padding: 0.75in;
                   box-sizing: border-box;
+                  display: flex;
+                  flex-direction: column;
+                  page-break-inside: avoid;
                 }
                 .poster-image {
                   width: 100%;
-                  aspect-ratio: 3/2;
+                  max-height: 3.5in;
                   object-fit: cover;
                   border: 2px solid rgba(255,255,255,0.2);
-                  margin-bottom: 2rem;
+                  margin-bottom: 1rem;
+                  flex-shrink: 0;
                 }
-                .poster-word {
+                h1 {
                   text-align: center;
                   font-weight: 900;
                   text-transform: uppercase;
                   letter-spacing: 0.2em;
                   color: #d97706;
-                  margin-bottom: 1rem;
+                  margin: 0.5rem 0;
                   white-space: nowrap;
+                  font-size: 2.5rem;
+                  flex-shrink: 0;
                 }
                 .poster-line {
                   width: 200px;
                   height: 4px;
                   background: #d97706;
-                  margin: 1.5rem auto;
+                  margin: 1rem auto;
+                  flex-shrink: 0;
                 }
-                .poster-text {
+                h2 {
                   text-align: center;
-                  font-size: 14pt;
+                  font-size: 1.2rem;
                   text-transform: uppercase;
                   letter-spacing: 0.1em;
                   color: white;
                   line-height: 1.6;
                   max-width: 100%;
+                  margin: 0;
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
                 }
                 @media print {
-                  body { margin: 0; }
+                  body { 
+                    margin: 0;
+                    padding: 0;
+                    height: 8.5in;
+                    width: 11in;
+                  }
                   .poster-container {
-                    width: 100%;
-                    height: 100vh;
+                    width: 11in;
+                    height: 8.5in;
+                    max-height: 8.5in;
+                  }
+                  .poster-image {
+                    max-height: 3.5in;
                   }
                 }
               </style>
@@ -217,9 +262,9 @@ function AffirmationPage() {
             <body>
               <div class="poster-container">
                 <img src="${imageUrl}" alt="${affirmation}" class="poster-image" />
-                <h2 class="poster-word">${longestWordWithDots}</h2>
+                <h1>${longestWordWithDots}</h1>
                 <div class="poster-line"></div>
-                <p class="poster-text">${affirmation}</p>
+                <h2>${affirmation}</h2>
               </div>
             </body>
           </html>
@@ -273,9 +318,8 @@ function AffirmationPage() {
                 className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-[0.2em] text-amber-600 mb-4 whitespace-nowrap" 
                 style={{ fontFamily: 'Georgia, serif' }}
               >
-                {longestWordWithDots}
+                {styledWord}
               </h2>
-              <div className="w-32 h-1 bg-amber-600 mx-auto mb-6"></div>
               {/* Full Affirmation Text */}
               <p className="text-lg md:text-xl uppercase tracking-wide text-white leading-relaxed max-w-3xl mx-auto">
                 {affirmation}

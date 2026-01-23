@@ -1,0 +1,26 @@
+{
+  "name": "affirmations-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack --port 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "^0.544.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.6",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.6",
+    "typescript": "^5.7.2"
+  }
+}
+

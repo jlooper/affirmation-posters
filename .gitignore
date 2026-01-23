@@ -1,13 +1,28 @@
+# Dependencies
 node_modules
-.DS_Store
+
+# Build outputs
 dist
 dist-ssr
-*.local
-count.txt
+.next
+out
+
+# Environment
 .env
+.env.local
+.env*.local
+*.local
+
+# TanStack
 .nitro
 .tanstack
 .wrangler
 .output
 .vinxi
+
+# OS/IDE
+.DS_Store
+
+# Misc
+count.txt
 todos.json
