@@ -1,48 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { RefreshCw, Loader2, Printer } from 'lucide-react'
-import { getAffirmation } from '../data/fetchAffirmation'
-import { uploadToCloudinary, buildCloudinaryImageUrl } from '../data/buildCloudinaryUrl'
+import { fetchNewAffirmationData } from '../data/fetchNewAffirmationData'
 
 export const Route = createFileRoute('/')({
   loader: async () => {
-    try {
-      // First fetch the affirmation
-      const affirmationData = await getAffirmation()
-      
-      // Extract the longest word from the affirmation to use as image search query
-      const words = affirmationData.affirmation.split(' ').filter(word => word.length > 0)
-      const longestWord = words.reduce((longest, current) => 
-        current.length > longest.length ? current : longest, ''
-      ).toLowerCase()
-      
-      // Fetch an image based on the longest word using direct fetch
-      const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY
-      const unsplashResponse = await fetch(
-        `https://api.unsplash.com/photos/random?client_id=${accessKey}&orientation=landscape&query=${encodeURIComponent(longestWord)}`
-      )
-      if (!unsplashResponse.ok) {
-        throw new Error('Failed to fetch Unsplash photo')
-      }
-      const unsplashData = await unsplashResponse.json() as any
-
-      // Upload the Unsplash image to Cloudinary
-      const publicId = await uploadToCloudinary(unsplashData.urls.full)
-
-      // Build the Cloudinary URL with transformations
-      const cloudinaryUrl = buildCloudinaryImageUrl(publicId)
-
-      return {
-        affirmation: affirmationData.affirmation,
-        longestWord,
-        cloudinaryUrl,
-        photoId: unsplashData.id,
-        publicId,
-      }
-    } catch (error) {
-      console.error('Loader error:', error)
-      throw error
-    }
+    return await fetchNewAffirmationData()
   },
   component: AffirmationPage,
 })
@@ -124,34 +87,10 @@ function AffirmationPage() {
     setIsLoading(true)
     setError(null)
     try {
-      // First fetch the affirmation
-      const affirmationData = await getAffirmation()
-      
-      // Extract the longest word from the affirmation to use as image search query
-      const words = affirmationData.affirmation.split(' ').filter(word => word.length > 0)
-      const longestWord = words.reduce((longest, current) => 
-        current.length > longest.length ? current : longest, ''
-      ).toLowerCase()
-      
-      // Fetch an image based on the longest word using direct fetch
-      const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY
-      const unsplashResponse = await fetch(
-        `https://api.unsplash.com/photos/random?client_id=${accessKey}&orientation=landscape&query=${encodeURIComponent(longestWord)}`
-      )
-      if (!unsplashResponse.ok) {
-        throw new Error('Failed to fetch Unsplash photo')
-      }
-      const unsplashData = await unsplashResponse.json() as any
-
-      // Upload the Unsplash image to Cloudinary
-      const publicId = await uploadToCloudinary(unsplashData.urls.full)
-
-      // Build the Cloudinary URL with transformations
-      const cloudinaryUrl = buildCloudinaryImageUrl(publicId)
-
-      setImageUrl(cloudinaryUrl)
-      setAffirmation(affirmationData.affirmation)
-      setLongestWord(longestWord)
+      const data = await fetchNewAffirmationData()
+      setImageUrl(data.cloudinaryUrl)
+      setAffirmation(data.affirmation)
+      setLongestWord(data.longestWord)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to fetch affirmation')
     } finally {

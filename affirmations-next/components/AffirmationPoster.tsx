@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { RefreshCw, Loader2, Printer } from 'lucide-react'
 import { fetchNewAffirmationData, type AffirmationData } from '@/lib/actions'
 
@@ -233,15 +234,16 @@ export default function AffirmationPoster({ initialData }: AffirmationPosterProp
                 <p className="text-red-400 text-center px-4">{error}</p>
               </div>
             ) : (
-              <img
+              <Image
                 src={imageUrl}
                 alt={affirmation}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
                 onError={() => {
                   console.error('Image failed to load:', imageUrl)
                   setError('Failed to load image')
                 }}
-                loading="lazy"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               />
             )}
           </div>
@@ -249,9 +251,9 @@ export default function AffirmationPoster({ initialData }: AffirmationPosterProp
           {/* Main Word (Successory Style) */}
           {!isLoading && !error && (
             <div className="text-center mb-6">
-              <h2
+              <h2 
                 ref={wordRef}
-                className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-[0.2em] text-amber-600 mb-4 whitespace-nowrap"
+                className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-[0.2em] text-amber-600 mb-4 whitespace-nowrap" 
                 style={{ fontFamily: 'Georgia, serif' }}
               >
                 {styledWord}
@@ -283,7 +285,7 @@ export default function AffirmationPoster({ initialData }: AffirmationPosterProp
               </>
             )}
           </button>
-
+          
           <button
             onClick={handlePrint}
             disabled={isLoading}
