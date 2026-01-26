@@ -1,5 +1,4 @@
 [build]
-  base = "affirmations-tanstack"
   command = "vite build"
   publish = "dist/client"
 
