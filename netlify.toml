@@ -1,6 +1,6 @@
 [build]
   base = "affirmations-tanstack"
-  command = "npm run build"
+  command = "vite build"
   publish = "dist/client"
 
 [functions]
