@@ -1,4 +1,4 @@
-import { server } from '../../dist/server/server.js'
+import server from '../../dist/server/server.js'
 
 export const handler = async (event, context) => {
   // Construct the full URL
