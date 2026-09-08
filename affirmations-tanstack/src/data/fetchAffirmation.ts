@@ -1,12 +1,8 @@
-import { createServerFn } from '@tanstack/react-start'
-
 export interface AffirmationResponse {
   affirmation: string
 }
 
-export const getAffirmation = createServerFn({
-  method: 'GET',
-}).handler(async (): Promise<AffirmationResponse> => {
+export async function getAffirmation(): Promise<AffirmationResponse> {
   try {
     const response = await fetch('https://www.affirmations.dev/')
     if (!response.ok) {
@@ -18,4 +14,4 @@ export const getAffirmation = createServerFn({
     console.error('Error fetching affirmation:', error)
     throw error
   }
-})
+}

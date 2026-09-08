@@ -1,2 +1,11 @@
 # Local Netlify folder
 .netlify
+
+# Build output
+dist
+node_modules
+
+# Env files
+.env
+.env.*
+!.env.example

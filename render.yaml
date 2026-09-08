@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: affirmations-tanstack
+    runtime: node
+    rootDir: affirmations-tanstack
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: VITE_UNSPLASH_ACCESS_KEY
+        sync: false
+      - key: VITE_CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: VITE_CLOUDINARY_API_KEY
+        sync: false
+      - key: VITE_CLOUDINARY_API_SECRET
+        sync: false
+      - key: VITE_CLOUDINARY_UPLOAD_PRESET
+        sync: false

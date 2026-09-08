@@ -6,6 +6,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "serve": "vite preview",
+    "start": "srvx --prod --static ../client dist/server/server.js",
     "test": "vitest run"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "lucide-react": "^0.544.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "srvx": "^1.0.4",
     "tailwindcss": "^4.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
